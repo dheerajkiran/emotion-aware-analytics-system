@@ -1,0 +1,52 @@
+[
+  {
+    "id": "joy-1",
+    "text": "Just got the callback - I got the job! Six months of interviews and rejections and it finally paid off. I'm still shaking, I can't stop smiling.",
+    "expected_dominant": "joy"
+  },
+  {
+    "id": "fear-1",
+    "text": "The wildfire jumped the ridge overnight and it's now less than two miles from our neighborhood. We've packed the car and we're waiting on the evacuation order. I don't know what we'll come back to.",
+    "expected_dominant": "fear"
+  },
+  {
+    "id": "anger-1",
+    "text": "The airline cancelled our flight with zero notice, gave the seats away, and then told us there was nothing they could do for three days. Absolutely unacceptable, I want a refund and an explanation.",
+    "expected_dominant": "anger"
+  },
+  {
+    "id": "sadness-1",
+    "text": "We had to put our dog down this morning. She was with us for thirteen years. The house feels unbearably quiet right now.",
+    "expected_dominant": "sadness"
+  },
+  {
+    "id": "disgust-1",
+    "text": "Found mold growing inside the sealed water bottle I'd been drinking from all week. I feel sick just thinking about it.",
+    "expected_dominant": "disgust"
+  },
+  {
+    "id": "surprise-1",
+    "text": "Opened my inbox expecting the usual spam and there was an email from a publisher wanting to buy the manuscript I sent out two years ago and completely forgot about.",
+    "expected_dominant": "surprise"
+  },
+  {
+    "id": "trust-1",
+    "text": "Our new manager actually followed through on every single thing she promised in the first month. It's a small thing but after the last few years here it means a lot.",
+    "expected_dominant": "trust"
+  },
+  {
+    "id": "anticipation-1",
+    "text": "Tickets go on sale at noon tomorrow and I've had three tabs open and my card ready since this morning. This is going to be the first show I've seen since before the pandemic.",
+    "expected_dominant": "anticipation"
+  },
+  {
+    "id": "neutral-1",
+    "text": "The city council meeting is being moved from Tuesday to Thursday this week due to a scheduling conflict with the venue.",
+    "expected_dominant": "neutral"
+  },
+  {
+    "id": "mixed-1",
+    "text": "Relieved the surgery went well but honestly terrified about the recovery time and whether insurance is actually going to cover what they said they would.",
+    "expected_dominant": "fear"
+  }
+]
