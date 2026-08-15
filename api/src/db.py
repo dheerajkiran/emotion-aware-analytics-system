@@ -100,6 +100,26 @@ def get_cached(external_ids: list[str], freshness_hours: float) -> dict[str, Eve
     return {row[0]: _row_to_record(row) for row in rows}
 
 
+def get_recent(subreddits: list[str] | None = None, window_hours: float = 72) -> list[EventRecord]:
+    """Recently-posted, already-classified rows for ranking - the read side of the /landscape route."""
+    query = """
+        select external_id, subreddit, external_type, title, body, url, permalink,
+               score, num_comments, created_at_source, embedding,
+               joy, trust, fear, surprise, sadness, disgust, anger, anticipation,
+               valence, arousal, dominant_emotion, summary, claude_model, author_hash, source
+        from emotion_events
+        where created_at_source > now() - (%s || ' hours')::interval
+    """
+    params: list = [window_hours]
+    if subreddits:
+        query += " and subreddit = any(%s)"
+        params.append(subreddits)
+
+    with _connect() as conn:
+        rows = conn.execute(query, params).fetchall()
+    return [_row_to_record(row) for row in rows]
+
+
 def _row_to_record(row) -> EventRecord:
     (
         external_id, subreddit, external_type, title, body, url, permalink,
