@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 
+from api.src import config  # noqa: F401 - importing loads .env before the skip-check below reads it
+
 pytestmark = pytest.mark.skipif(
     not os.environ.get("ANTHROPIC_API_KEY"),
     reason="ANTHROPIC_API_KEY not set - classification tests make real (cheap, Haiku) API calls",
