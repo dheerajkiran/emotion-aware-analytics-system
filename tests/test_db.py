@@ -98,11 +98,19 @@ def test_upsert_same_external_id_updates_not_duplicates():
     assert rows[1] == 999, "expected the second upsert's score to win"
 
 
-def test_stale_classification_is_not_returned_as_cached():
+def test_freshness_window_is_based_on_classified_at_not_created_at_source():
+    """upsert_events always stamps classified_at = now(), regardless of the post's own age -
+    freshness is about how recently *we classified it*, not how old the Reddit post is."""
     from api.src.db import get_cached, upsert_events
 
-    old = _record("stale-1", created_at_source=datetime.now(timezone.utc) - timedelta(hours=48))
-    upsert_events([old])
+    old_post = _record("stale-1", created_at_source=datetime.now(timezone.utc) - timedelta(hours=48))
+    upsert_events([old_post])
 
+    # A real post's age doesn't make the cache entry stale...
     cached = get_cached(["stale-1"], freshness_hours=6)
-    assert "stale-1" not in cached, "classified_at is set to now() on upsert, so freshness depends on classified_at, not created_at_source - this documents that distinction"
+    assert "stale-1" in cached, "expected a just-classified row to be cached regardless of the post's own age"
+
+    # ...only how long ago classified_at itself was does. classified_at was set to now() a
+    # moment ago, so a zero-width freshness window should already exclude it.
+    cached = get_cached(["stale-1"], freshness_hours=0)
+    assert "stale-1" not in cached, "expected a 0-hour freshness window to exclude anything already classified"

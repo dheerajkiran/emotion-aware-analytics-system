@@ -50,7 +50,13 @@ def to_classified_post(record: EventRecord) -> ClassifiedPost:
 @contextmanager
 def _connect():
     with psycopg.connect(config.DATABASE_URL, autocommit=True) as conn:
-        register_vector(conn)
+        try:
+            register_vector(conn)
+        except psycopg.ProgrammingError:
+            # The vector extension doesn't exist yet - true only before migration 0001
+            # has run. Skip registering the adapter; nothing on this connection needs
+            # it until the extension (and the embedding column) actually exist.
+            pass
         yield conn
 
 
@@ -110,7 +116,7 @@ def _row_to_record(row) -> EventRecord:
         external_id=external_id, subreddit=subreddit, external_type=external_type,
         title=title, body=body, url=url, permalink=permalink,
         score=score, num_comments=num_comments, created_at_source=created_at_source,
-        embedding=list(embedding), emotion=emotion, claude_model=claude_model,
+        embedding=embedding.to_list(), emotion=emotion, claude_model=claude_model,
         author_hash=author_hash, source=source,
     )
 
