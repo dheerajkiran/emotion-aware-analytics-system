@@ -1,46 +1,100 @@
 # Emotion-Aware Analytics System
 
-An on-demand pipeline that fetches live Reddit discussion, classifies it against a structured 8-emotion taxonomy using Claude, clusters near-duplicate posts into distinct storylines, and ranks them by a blend of engagement and emotional intensity — so you can see what's actually driving reaction online right now without reading a subreddit yourself.
+Train an emotion-recognition model and use it to analyze collections of real opinions about products, everyday experiences, public issues, and events. The system will produce reports that connect emotions with recurring themes and supporting comments.
 
-> Status: in active development. See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system design.
+The product will have two interfaces:
 
-## What it does
+- **Web application:** import a collection of opinions, explore the findings, and export a report.
+- **Browser extension:** analyze accessible reviews or comments on a supported webpage and display a compact result beside the page.
 
-- **Fetches** current hot/rising posts from configured subreddits, on demand — triggered by opening the dashboard or hitting refresh, not a background poller.
-- **Classifies** each post against Plutchik's eight primary emotions (joy, trust, fear, surprise, sadness, disgust, anger, anticipation) plus overall valence/arousal, and writes a short neutral summary of what it's about — both from a single validated, structured Claude call.
-- **Clusters** near-duplicate posts about the same story into one entry, via embedding similarity — so the feed shows distinct storylines, not fifteen copies of the same event.
-- **Ranks** storylines by a blend of engagement velocity and emotional intensity — surfacing what's both spreading fast *and* provoking strong reaction, not just what Reddit's own sort already shows.
-- **Caches** every classification so re-opening the app doesn't re-pay for posts already seen, and opportunistically builds a history over real usage.
+## Project status
 
-## Why this is useful
+**Planning the pivot as of November 3, 2026.** The code currently implements an earlier Reddit/Claude backend prototype. The trained model, new analysis workflow, web interface, and extension described here are planned work.
 
-Reddit's own "hot" sort already tells you what's popular. This adds the signal that sort doesn't: is this provoking real reaction, or just mild interest? Opening the dashboard replaces manually scanning several subreddits and mentally merging the ten posts that are all about the same event — instead, one ranked, deduplicated list, in about as long as it takes to read a few headlines.
+Read [PROJECT_PLAN.md](PROJECT_PLAN.md) for the scope, data strategy, training and evaluation approach, target architecture, extension design, and code reuse decisions. [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md) defines the development phases, checkpoint tests, commit boundaries, and PR merge workflow. [ARCHITECTURE.md](ARCHITECTURE.md) preserves the superseded Reddit design for reference.
 
-Worth being precise about what it isn't: it's not a verified news source (an emotion score describes the intensity of Reddit's reaction, not the real-world importance or accuracy of the underlying event), and it's Reddit-only, so it reflects Reddit's communities, not "public sentiment" broadly. It's a triage tool — it tells you what's worth a closer look, not a substitute for reading the thread once something ranks high.
+## Intended workflow
 
-## Architecture at a glance
-
-```
-Next.js (Vercel) --GET /landscape--> FastAPI (Cloud Run, scale-to-zero)
-    fetch Reddit → classify (Claude) → embed → cluster into storylines → rank → return
-                                    ↕
-                        Neon Postgres + pgvector (cache/history)
+```text
+Emotion-labeled examples -> training and evaluation -> versioned emotion model
+                                                               |
+Imported opinions or webpage comments -> model + theme analysis -> report
 ```
 
-Nothing runs continuously — the whole pipeline executes inside a single request. Full rationale for each choice, including the cost research behind it, is in [ARCHITECTURE.md](ARCHITECTURE.md).
+The analysis should answer:
 
-## Stack
+- Which emotions are expressed in the collected opinions?
+- Which themes are associated with those emotions?
+- How do patterns differ across products, topics, or supported time periods?
+- Which actual comments support each finding?
 
-FastAPI · Pydantic AI · Claude API (Anthropic) · sentence-transformers · scikit-learn (HDBSCAN) · Neon (Postgres + pgvector) · Next.js / TypeScript · Google Cloud Run · Vercel
+Reports will include the number of opinions analyzed, exclusions, collection coverage, model version, and supporting excerpts. Findings describe the collected opinions; they do not establish the views of the whole population.
 
-## Cost
+## First version
 
-Every piece of infrastructure runs on a genuine free tier (Cloud Run, Neon, Vercel) and nothing runs when the app isn't in use. The only real recurring cost is the Claude API itself, bounded by a Haiku-default model, an engagement filter before classification, and a spend cap set in the Anthropic Console.
+The recommended initial scope is **English product reviews from one category**, using a small set of products with enough reviews for useful comparisons. The exact category and sample will be selected after inspecting the data. Support for public events and issues will follow through the same analysis interface.
 
-## Getting started
+Training data and analysis data serve different purposes:
 
-Local dev instructions land here once `api/` and `web/` are built out.
+| Purpose | Candidate source |
+| --- | --- |
+| Teach the model to recognize emotions | [GoEmotions](https://github.com/google-research/google-research/tree/master/goemotions), a published dataset with human emotion annotations |
+| Analyze everyday product experiences | [Amazon Reviews'23](https://amazon-reviews-2023.github.io/), with downloadable review text, product identifiers, and timestamps |
+| Extend to public issues | [Regulations.gov](https://open.gsa.gov/api/regulationsgov/), with comments grouped around specific proposals |
+
+The model will be fine-tuned from a pretrained text encoder and evaluated against a simple baseline and a manually labeled sample from the application domain. Multi-label predictions will allow one opinion to express several emotions. Report generation will use computed statistics and source excerpts.
+
+## Browser extension
+
+On a supported page, the user will click **Analyze opinions** to open a side panel containing emotion distributions, recurring themes, and evidence. It will state its coverage, for example: "Analyzed 40 reviews loaded on this page."
+
+The first extension will support one website. Site-specific extraction, pagination, and dynamically loaded comments will be handled explicitly. Automatic analysis on supported sites is a later, optional feature. The extension and web application will share the same analysis API and trained model.
+
+## Development phases and checkpoints
+
+Each checkpoint has a stable ID, a concrete deliverable, required tests, and a visible result to review. Commit each completed checkpoint on its feature branch. Use **squash and merge** to merge PRs into `main` after the required checks pass, producing one final commit per PR. Use a checkpoint PR by default, or a small phase PR for closely related checkpoints. Include every checkpoint ID in the final squash commit message and append the actual PR number to its title as `(#N)`.
+
+| Phase | Checkpoints | Result to review |
+| --- | --- | --- |
+| 0. Project foundation | P0.C1 plan; P0.C2 isolate the new application; P0.C3 automated checks | Documented scope and a runnable, independently tested starting point |
+| 1. Data and contracts | P1.C1 data audit and contracts; P1.C2 importer; P1.C3 labeled domain evaluation set | A traceable real opinion collection and a usable evaluation protocol |
+| 2. Model training | P2.C1 baseline; P2.C2 fine-tuning pipeline; P2.C3 model evaluation and selection | Reproducible experiments and an evaluated model artifact |
+| 3. Core analytics | P3.C1 inference and storage; P3.C2 themes and statistics; P3.C3 reports | One reproducible report with source evidence |
+| 4. API and web application | P4.C1 analysis API; P4.C2 web interface; P4.C3 integrated application | Import, analyze, inspect evidence, and export through the application |
+| 5. Browser extension | P5.C1 extension shell; P5.C2 extraction; P5.C3 analytics panel; P5.C4 complete extension validation | Analysis on one supported website with accurate coverage |
+| 6. Broader topics | P6.C1 new-domain evaluation; P6.C2 event/issue analysis; P6.C3 release validation | An evaluated second domain and a reproducible release candidate |
+
+See [the detailed checkpoint roadmap](DEVELOPMENT_ROADMAP.md#development-checkpoints) for each deliverable and testing gate, and [the commit and PR workflow](DEVELOPMENT_ROADMAP.md#commit-and-pr-workflow) for merge rules. A phase is complete only when its checkpoints are on `main` and its combined demonstration passes.
+
+Current progress: **P0.C1 planning documentation is published directly to `main` as one documentation commit. This initial baseline is the direct-publication exception; subsequent work uses the PR and squash-merge workflow. Implementation checkpoints have not started.**
+
+## Existing code: reuse selectively
+
+Keep this repository and its history. Build new training, analysis, and reporting modules around source-neutral contracts, while reusing suitable infrastructure.
+
+| Existing area | Direction |
+| --- | --- |
+| FastAPI application and health endpoint | Reuse; adapt routes and request configuration |
+| Batch embedding utilities | Reuse and evaluate on the chosen domain |
+| HDBSCAN clustering | Evaluate and adapt for themes; current storyline grouping is a different task |
+| Postgres access and migration patterns | Reuse patterns; introduce new tables and migrations |
+| Reddit ingestion, `/landscape`, and engagement ranking | Preserve as legacy code during migration |
+| Claude emotion classification and fixed Plutchik output | Replace in the primary workflow with trained-model inference and a versioned label schema |
+
+The detailed file-by-file assessment is in [PROJECT_PLAN.md](PROJECT_PLAN.md#existing-code-and-migration).
+
+## Repository today
+
+- `api/src/`: legacy Reddit ingestion, Claude classification, embeddings, ranking, database access, and FastAPI routes.
+- `db/migrations/`: existing Postgres/pgvector schema and index migrations.
+- `scripts/`: legacy demo-data seeding.
+- `tests/`: existing classification, embedding, database, ranking, and Reddit normalization checks.
+- `PROJECT_PLAN.md`: current product and implementation plan.
+- `DEVELOPMENT_ROADMAP.md`: phased checkpoints, validation requirements, progress, and commit/PR workflow.
+- `ARCHITECTURE.md`: historical design of the Reddit prototype.
+
+There are no runnable setup instructions for the pivot yet. The existing `.env.example` and dependency files belong to the legacy prototype. Some existing tests and scripts call Claude or write to the configured database; they are not a self-contained demonstration of the new product.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Repository code is MIT-licensed; see [LICENSE](LICENSE). External datasets and pretrained models have their own terms and attribution requirements.
