@@ -1,5 +1,13 @@
 # Architecture
 
+> **Historical design — superseded November 3, 2026.** This document describes
+> the original Reddit/Claude prototype, whose code remains in the repository.
+> The active direction is a trained emotion model, opinion analytics and reports,
+> a web application, and a later browser extension. Read [PROJECT_PLAN.md](PROJECT_PLAN.md)
+> for the current plan and [README.md](README.md) for the project overview.
+> Deployment and pricing statements below record earlier design assumptions;
+> they are not verification of a live deployment or current provider terms.
+
 How the Emotion-Aware Analytics System is put together, and why.
 
 ## Overview
