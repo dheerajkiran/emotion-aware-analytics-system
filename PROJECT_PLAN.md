@@ -252,7 +252,7 @@ The detailed execution and progress record is [DEVELOPMENT_ROADMAP.md](DEVELOPME
 | 5. Extension | P5.C1, P5.C2, P5.C3, P5.C4 | Verified extraction on one supported site and agreement with analysis of the same captured inputs |
 | 6. Broader topics | P6.C1, P6.C2, P6.C3 | Separate domain evaluation, an event/issue report, and combined release validation |
 
-Commit each completed checkpoint after its relevant checks pass. Use a PR for every merge to `main`; default to checkpoint-sized PRs and group checkpoints only when the roadmap's conditions are met. Phase completion requires merged checkpoints and a passing demonstration of the combined capability. These workflow rules are documented policy; GitHub CI and branch settings still need implementation in Phase 0.
+Commit each completed checkpoint on its feature branch after its relevant checks pass. Merge PRs into `main` using **squash and merge**, with one final commit per PR containing all included checkpoint IDs. Default to checkpoint-sized PRs and group checkpoints only when the roadmap's conditions are met. Phase completion requires merged checkpoints and a passing demonstration of the combined capability. These workflow rules are documented policy; GitHub CI and branch settings still need implementation in Phase 0.
 
 Keep local experimentation possible before cloud deployment. Add operational controls and larger-job execution as the service is exposed and workloads are measured. Avoid treating an always-on collector or any particular hosting provider as a prerequisite.
 

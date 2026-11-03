@@ -2,29 +2,49 @@
 
 **Updated:** November 3, 2026
 
-**Status:** P0.C1 planning documentation is validated; its merge is pending. No pivot implementation checkpoint has been completed or merged.
+**Status:** P0.C1 planning documentation was merged in [PR #1](https://github.com/dheerajkiran/emotion-aware-analytics-system/pull/1). Implementation checkpoints have not started.
 
 Read [README.md](README.md) for the overview and [PROJECT_PLAN.md](PROJECT_PLAN.md) for the product and technical design. This roadmap is the execution and progress record. The phases below are sequential by default; individual preparatory work may overlap when dependencies are explicit.
 
 ## Commit and PR workflow
 
+### Publication hygiene
+
+This is a required check before every commit and push, including documentation updates.
+
+- Keep source comments, documentation, commit messages, branch names, and PR titles/descriptions focused on the project. Exclude tool signatures, generated-by notices, and unsolicited authorship/co-author trailers.
+- Keep chat transcripts, session identifiers, development-session prompts, and personal tool configuration out of published project files and artifacts.
+- Inspect the staged diff, intended commit message, configured author/committer metadata, and PR text before publication. Check export files and generated artifacts for accidental session details as well.
+- Preserve required third-party notices, dataset/model provenance, and accurate implementation and validation records. Technical references to a model or service used by the application remain part of its documentation.
+- Correct any publication-hygiene issue before committing or pushing. Recheck the final commit and PR text after creation.
+
 ### Checkpoint lifecycle
 
 1. **Choose the checkpoint.** Confirm its scope, dependencies, required checks, and observable result. Decide whether it has its own PR or belongs to a small group before implementing it.
-2. **Work on a branch.** Start from current `main`, for example `phase-1/p1-c2-review-importer`. For a grouped PR, keep consecutive checkpoint commits on one branch. Rebase or update dependent branches after their prerequisites merge.
+2. **Work on a branch.** Start from current `main`, for example `phase-1/p1-c2-review-importer`. For a grouped PR, keep consecutive checkpoint commits on one branch. After a prerequisite is squash-merged, start dependent work from updated `main`, or rebase only the remaining work onto it; avoid including already-merged changes again.
 3. **Implement and test.** Run the checkpoint's checks and relevant regression checks. Demonstrate the result using a small, traceable input. Fix failed required checks before declaring the checkpoint validated.
 4. **Record the evidence.** Summarize what works, actual test commands and outcomes, input/model versions, demonstration artifacts, and known limitations. Update this roadmap's progress table.
-5. **Commit the checkpoint.** Use one coherent checkpoint commit or a small set of commits with a clear final checkpoint boundary, for example `feat(data): add repeatable review importer (P1.C2)`. Each checkpoint must remain identifiable even when grouped in one PR.
+5. **Commit the checkpoint.** On the feature branch, use one coherent checkpoint commit or a small set of commits with a clear final checkpoint boundary, for example `feat(data): add repeatable review importer (P1.C2)`. Each checkpoint must remain identifiable even when grouped in one PR.
 6. **Open the PR after local validation.** List the included checkpoint IDs, what changed, test evidence, demonstration, and any migration or artifact requirements. PR CI then verifies the pushed commit.
-7. **Review and merge.** Resolve review findings and merge through the PR only after all required checks pass for its latest commit. Update with `main` and rerun affected checks if integration changes the code. Do not count a failed or skipped required check as a pass.
-8. **Record the merge.** Add the PR/merge reference to the progress table. At the final checkpoint of a phase, demonstrate the combined capability before calling the phase complete.
+7. **Review and squash-merge.** Resolve review findings and use squash and merge only after all required checks pass for the latest PR commit. Update with `main` and rerun affected checks if integration changes the code. Inspect the final squash message and include all checkpoint IDs. Do not count a failed or skipped required check as a pass.
+8. **Record the merge.** Add the PR reference and resulting squash commit SHA to each included checkpoint's progress entry. At the final checkpoint of a phase, demonstrate the combined capability before calling the phase complete.
 
 Completed checkpoints get commits even if their PR will include a later related checkpoint. A committed checkpoint is not automatically merged or phase-complete. Draft work may be saved in intermediate commits, but must not be labeled a validated checkpoint until its gate passes.
+
+### Merge method: squash and merge
+
+Use **squash and merge** for checkpoint and grouped phase PRs. This creates one final commit per PR on `main`; the feature branch's individual checkpoint and intermediate commits do not become separate commits on `main`.
+
+For a single-checkpoint PR, include its ID in the final commit message. For a grouped PR, list every included checkpoint ID in the final commit message and PR description, and link each progress entry to the same resulting squash commit. Retain the individual checkpoints' validation evidence in the PR and checkpoint records.
+
+Inspect and edit the proposed squash title/body before merging so it contains the project change, checkpoint IDs, and relevant context. Apply the publication-hygiene check to that final message as well as the original branch commits.
+
+After merging, update local `main` and delete the completed remote and local feature branches while preserving uncommitted work. A squash-merged branch may fail Git's ordinary ancestry check for local deletion. Verify that its PR is merged and the intended changes are present on `main` before removing that local branch.
 
 ### Choosing the merge boundary
 
 - **Default: one PR per checkpoint.** Use this for independently testable capabilities and changes to contracts, migrations, inference, or reporting behavior.
-- **Grouped or phase PR:** use only for closely related checkpoints that still form a small, reviewable diff. Each checkpoint keeps its own commit, evidence, and passing checks. Grouped PRs must include the checks for every included checkpoint plus an integration demonstration.
+- **Grouped or phase PR:** use only for closely related checkpoints that still form a small, reviewable diff. Each checkpoint gets its own feature-branch commit, evidence, and passing checks; the PR becomes one squash commit on `main`. Grouped PRs must include the checks for every included checkpoint plus an integration demonstration.
 - **Split oversized work:** divide a checkpoint further if it grows beyond a coherent review. Extend its ID, such as `P3.C2a`, and update the roadmap before claiming completion.
 - **Keep `main` usable:** partially introduced capabilities must be isolated or disabled until their dependencies and tests are ready. Do not expose an unfinished feature simply because its infrastructure merged.
 - **No direct merges outside PRs:** all merges into `main` follow the testing and PR gate, including documentation changes. Whether a PR is a checkpoint or phase PR does not weaken the gate.
@@ -55,7 +75,7 @@ Do not invent command results or mark planned tests as passed. These documentati
 
 ## Development checkpoints
 
-Every row below is a separate checkpoint and commit boundary. The validation column is required evidence for that checkpoint. Phase merge recommendations allow small groups; they do not require waiting until phase-end for independently working changes.
+Every row below is a separate checkpoint and feature-branch commit boundary. The validation column is required evidence for that checkpoint. Phase merge recommendations allow small groups; each merged PR becomes one squash commit on `main`. Independently working changes can merge before phase-end.
 
 ### Phase 0: Project foundation
 
@@ -176,7 +196,7 @@ Track each checkpoint separately. Add links to its evidence, commit, and PR as w
 
 | Checkpoint IDs | Current status | Evidence and commit/PR reference |
 | --- | --- | --- |
-| P0.C1 | Validated locally; merge pending | Documentation link, heading, fence, whitespace, and checkpoint-ID checks passed; `git diff --check` passed. See the [checkpoint comparison](https://github.com/dheerajkiran/emotion-aware-analytics-system/compare/main...docs/p0-c1-project-plan) for commit and PR history. |
+| P0.C1 | Merged | Documentation checks passed. [PR #1](https://github.com/dheerajkiran/emotion-aware-analytics-system/pull/1), [merge commit 11e730e](https://github.com/dheerajkiran/emotion-aware-analytics-system/commit/11e730ed0c1100ab7959e3cf3c6258312716cb2b). This planning baseline used a regular merge before the squash policy was adopted. |
 | P0.C2 | Planned | Not started |
 | P0.C3 | Planned | Not started |
 | P1.C1 | Planned | Not started |

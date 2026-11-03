@@ -52,7 +52,7 @@ The first extension will support one website. Site-specific extraction, paginati
 
 ## Development phases and checkpoints
 
-Each checkpoint has a stable ID, a concrete deliverable, required tests, and a visible result to review. Commit each completed checkpoint. Merge to `main` through a PR after the required checks pass; use a checkpoint PR by default, or a small phase PR for closely related checkpoints.
+Each checkpoint has a stable ID, a concrete deliverable, required tests, and a visible result to review. Commit each completed checkpoint on its feature branch. Use **squash and merge** to merge PRs into `main` after the required checks pass, producing one final commit per PR. Use a checkpoint PR by default, or a small phase PR for closely related checkpoints, and include every checkpoint ID in the final squash commit message.
 
 | Phase | Checkpoints | Result to review |
 | --- | --- | --- |
@@ -66,7 +66,7 @@ Each checkpoint has a stable ID, a concrete deliverable, required tests, and a v
 
 See [the detailed checkpoint roadmap](DEVELOPMENT_ROADMAP.md#development-checkpoints) for each deliverable and testing gate, and [the commit and PR workflow](DEVELOPMENT_ROADMAP.md#commit-and-pr-workflow) for merge rules. A phase is complete only when its checkpoints are merged and its combined demonstration passes.
 
-Current progress: **P0.C1 documentation checks have passed locally; its merge is pending. Implementation checkpoints have not started.**
+Current progress: **P0.C1 planning documentation was merged in [PR #1](https://github.com/dheerajkiran/emotion-aware-analytics-system/pull/1). Implementation checkpoints have not started.**
 
 ## Existing code: reuse selectively
 
